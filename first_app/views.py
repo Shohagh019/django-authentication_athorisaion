@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import RegisterForm
+from .forms import RegisterForm, UpdateUserForm
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import authenticate,login, logout, update_session_auth_hash
@@ -39,33 +39,62 @@ def user_login(request):
         return redirect('profile')
     
 def user_profile(request):
-    if request.user.is_authenticated:
-        return render(request, 'profile.html')
+    if  request.user.is_authenticated:    
+        if request.method == 'POST':
+            form = UpdateUserForm(request.POST, instance = request.user)
+            if form.is_valid():
+                messages.success(request, 'Congratulations! Your Account Information Updated Successfully!')
+                form.save()
+                # return redirect('home')
+        else:
+            form = UpdateUserForm(instance = request.user)
+        return render(request, 'profile.html', {'form': form})
     else:
-        return redirect('login')
+        return redirect('signup')  
 
 def user_logout(request):
     logout(request)
     return redirect('login')
 
 def pass_change(request):
-    if request.method == 'POST':
-        form = SetPasswordForm(user= request.user, data= request.POST)
-        if form.is_valid():
-            form.save()
-            update_session_auth_hash(request, form.user)
-            return redirect('profile')
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = PasswordChangeForm(user= request.user, data= request.POST)
+            if form.is_valid():
+                form.save()
+                update_session_auth_hash(request, form.user)
+                return redirect('profile')
+        else:
+            form = PasswordChangeForm(user=request.user)
+        return render(request, 'passchange.html', {'form':form})    
     else:
-        form = SetPasswordForm(user=request.user)
-    return render(request, 'passchange.html', {'form':form})    
-
+        return redirect('login')
+    
 def pass_change_easy(request):
-    if request.method == 'POST':
-        form = SetPasswordForm(user= request.user, data= request.POST)
-        if form.is_valid():
-            form.save()
-            update_session_auth_hash(request, form.user)
-            return redirect('profile')
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = SetPasswordForm(user= request.user, data= request.POST)
+            if form.is_valid():
+                form.save()
+                update_session_auth_hash(request, form.user)
+                return redirect('login')
+        else:
+            form = SetPasswordForm(user=request.user)
+        return render(request, 'passchange.html', {'form':form})    
     else:
-        form = SetPasswordForm(user=request.user)
-    return render(request, 'passchange.html', {'form':form})    
+        return redirect('login')
+    
+
+def change_user_data(request):
+    if  request.user.is_authenticated:    
+        if request.method == 'POST':
+            form = UpdateUserForm(request.POST, instance = request.user)
+            if form.is_valid():
+                messages.success(request, 'Congratulations! Your Account Information Updated Successfully!')
+                form.save()
+                # return redirect('home')
+        else:
+            form = UpdateUserForm()
+        return render(request, 'profile.html', {'form': form})
+    else:
+        return redirect('signup')    

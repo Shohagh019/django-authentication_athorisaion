@@ -1,8 +1,51 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>This is profile Page</h1>
-<h1>Hello Mr. {{user}}! Welcome to Aslihan's Shop</h1>
-<p><a href="{% url 'pass_change'%}">Change your Password</a></p>
-<p><a href="{% url 'pass_change_easy'%}">Change your Password without old password</a></p>
+<h1 class="shop-heading">Hello Mr. {{user}}! Welcome to Aslihan's Shop</h1>
+
+<div class="link-container">
+    <p><a class="styled-link" href="{% url 'pass_change' %}">Change your Password</a></p>
+    <p><a class="styled-link styled-link-alt" href="{% url 'pass_change_easy' %}">Change your Password without old password</a></p>
+</div>
+<form method="post">
+  <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow-lg bg-light p-4">
+            <h3 class="card-title text-center mb-4">Update Your Profile Information</h3>
+            {% load crispy_forms_tags %}
+            <form method="post">
+              {% csrf_token %}
+              <!-- {{ form|crispy }} -->
+                {% for fm in form %}
+                {{fm.label_tag}}
+                {{fm}}
+                {{fm.errors|striptags}}
+                {% endfor %}
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-warning btn-lg">Submit</button>
+              </div>
+              {% if form.non_field_errors %}
+              {% for er in form.non_field_errors %}
+              <p class="text-danger p-3">{{er}}</p>
+              {% endfor %}
+              {% endif %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</form>
+{% if messages %}
+{% for message in messages %}
+  <div class="toast align-items-center text-bg-{{ message.tags }} border-0 fade show ms-auto" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body text-center">
+        {{ message }}
+      </div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+{% endfor %}
+{% endif %}
 {% endblock %}
