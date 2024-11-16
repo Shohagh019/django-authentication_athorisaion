@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="post">
+  <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card shadow-lg bg-light p-4">
+            <h3 class="card-title text-center mb-4">Change Password</h3>
+            {% load crispy_forms_tags %}
+            <form method="post">
+              {% csrf_token %}
+              <!-- {{ form|crispy }} -->
+                {% for fm in form %}
+                {{fm.label_tag}}
+                {{fm}}
+                <p class="text-warning text-center">
+                    {{fm.errors|striptags}}
+                </p>
+                {% endfor %}
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-warning btn-lg">Submit</button>
+              </div>
+              {% if form.non_field_errors %}
+              {% for er in form.non_field_errors %}
+              <p class="text-danger p-3">{{er}}</p>
+              {% endfor %}
+              {% endif %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</form>
+{% if messages %}
+{% for message in messages %}
+  <div class="toast align-items-center text-bg-{{ message.tags }} border-0 fade show ms-auto" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body text-center">
+        {{ message }}
+      </div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+{% endfor %}
+{% endif %}
+{% endblock %}
